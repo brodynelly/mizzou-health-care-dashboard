@@ -3,7 +3,7 @@
 This guide will help you set up and run the Django project using Docker and Docker Compose. Please follow the steps below to get started.
 
 ## PICTURES: 
-
+![image](https://github.com/user-attachments/assets/3e47f786-4a8e-4b22-8a82-9ca337fad865)
 <img width="1511" alt="image" src="https://github.com/user-attachments/assets/06b74985-378c-4dd2-8515-770670809478" />
 <img width="1511" alt="image" src="https://github.com/user-attachments/assets/ae2733d1-3116-4d7d-b6b6-8ac2c95ca343" />
 <img width="1511" alt="image" src="https://github.com/user-attachments/assets/468f9897-7297-42f1-be9a-0ed71b471509" />
