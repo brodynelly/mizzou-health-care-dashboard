@@ -1,8 +1,7 @@
-from django.db import migrations
-from datetime import date
 import random
-from django.core.exceptions import ValidationError
+from datetime import date
 
+from django.db import migrations
 
 UNASSIGNED = 'unassigned'
 NURSE_ASSIGNED = 'nurse_assigned'

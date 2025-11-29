@@ -1,6 +1,7 @@
-from django.db import models
 import uuid
-from django.contrib.auth import get_user_model
+
+from django.db import models
+
 
 class Patient(models.Model):
     UNASSIGNED = 'unassigned'
@@ -11,7 +12,7 @@ class Patient(models.Model):
         (NURSE_ASSIGNED, 'Nurse Assigned'),
         (DOCTOR_ASSIGNED, 'Doctor Assigned'),
     ]
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     address = models.TextField()
@@ -23,24 +24,24 @@ class Patient(models.Model):
     treatment_area = models.CharField(max_length=100)  # Treatment unit or department
     geocode = models.ForeignKey('Geocode', on_delete=models.SET_NULL, null=True, blank=True, related_name='patients')
 
-    
+
     treated_by = models.ManyToManyField("accounts.CustomUser", through='TreatmentRecord', related_name='patients')
     state = models.CharField(max_length=15, choices=STATE_CHOICES, default=UNASSIGNED)
     nurse_count = models.PositiveIntegerField(default=0)
     doctor_assigned = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.name}"
-    
+
     def assign_nurse(self, nurse_user):
         if nurse_user.role.name != 'nurse':
             raise ValueError("User must have role 'nurse' to be assigned as a nurse.")
-        
+
         if self.nurse_count >= 3:
             raise ValueError("A patient can have no more than 3 nurses assigned.")
-        
+
         if TreatmentRecord.objects.filter(patient=self, worker=nurse_user).exists():
             raise ValueError(f"{nurse_user.name} is already assigned as a nurse to this patient.")
-        
+
         # Create the TreatmentRecord for the nurse
         TreatmentRecord.objects.create(patient=self, worker=nurse_user)
         self.nurse_count += 1
@@ -50,16 +51,16 @@ class Patient(models.Model):
     def assign_doctor(self, doctor_user):
         if doctor_user.role.name != 'doctor':
             raise ValueError("User must have role 'doctor' to be assigned as a doctor.")
-        
+
         if TreatmentRecord.objects.filter(patient=self, worker=doctor_user).exists():
             raise ValueError(f"{doctor_user.name} is already assigned as a doctor to this patient.")
-        
+
         if self.doctor_assigned:
             raise ValueError("A patient can have only one doctor assigned.")
-        
+
         if self.nurse_count == 0:
             raise ValueError("A doctor cannot be assigned unless at least one nurse is assigned.")
-        
+
         # Create the TreatmentRecord for the doctor
         TreatmentRecord.objects.create(patient=self, worker=doctor_user)
         self.doctor_assigned = True
@@ -92,14 +93,14 @@ class Patient(models.Model):
             self.save()
         except TreatmentRecord.DoesNotExist:
             raise ValueError("This doctor is not assigned to the patient.")
-    
+
 
 
 
 class TreatmentRecord(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     worker = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE, blank=True, null=True)  # Renamed to 'worker'
-    
+
     class Meta:
         unique_together = ('patient', 'worker')  # Ensure each worker is only assigned once per patient
 

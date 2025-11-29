@@ -2,6 +2,7 @@
 
 from django.db import migrations
 
+
 def generate_drugs(apps, schema_editor):
     Drug = apps.get_model('documents', 'Drug')
     drugs = [

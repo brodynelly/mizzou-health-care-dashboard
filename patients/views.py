@@ -1,22 +1,19 @@
-from django.shortcuts import render
-from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Patient, Geocode
-from django.http import HttpResponseRedirect
-from django.views.generic import ListView, View
-from django.db.models import Q
-from django.core.paginator import Paginator
-from .models import Patient, TreatmentRecord
-from django.views.generic import TemplateView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from .models import Geocode, Patient
-from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.utils.decorators import method_decorator
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
+
+from .models import Geocode, Patient, TreatmentRecord
 
 CustomUser = get_user_model()
 
@@ -58,7 +55,7 @@ class PatientListView(ListView):
                 Q(treatment_area__icontains=search_query) |
                 Q(geocode__name__icontains=search_query)
             )
-            
+
         # Filter by treatment state if selected
         if treatment_state:
             queryset = queryset.filter(state=treatment_state)
@@ -150,7 +147,7 @@ class ICareBoardView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        
+
         # Ensure each patient has full context with treatment details
         for patient in context['patients']:
             # Check if the current user is assigned to the patient
@@ -206,7 +203,7 @@ class ICareBoardView(ListView):
                         patient.assign_nurse(request.user)
                     else:
                         messages.warning(request, "Cannot assign more than 3 nurses to a patient.")
-            
+
             elif action == 'unassign':
                 if request.user.role.name == 'doctor':
                     patient.unassign_doctor(request.user)
@@ -235,7 +232,7 @@ class MyBoardView(ListView):
 
     def get_queryset(self):
             user = self.request.user  # Access the current user
-            
+
             if user.is_authenticated:
                 # Retrieve all patients assigned to the current user through TreatmentRecord
                 assigned_patients = Patient.objects.filter(
@@ -275,12 +272,12 @@ class MyBoardView(ListView):
             if user.role.name == 'doctor':
                 patient.unassign_doctor(user)
                 messages.success(request, f"{user.name} has been unassigned as the doctor for {patient.name}.")
-            
+
             # Unassign the nurse if the user is a nurse
             elif user.role.name == 'nurse':
                 patient.unassign_nurse(user)
                 messages.success(request, f"{user.name} has been unassigned as a nurse for {patient.name}.")
-            
+
         except ValueError as e:
             messages.error(request, f"Failed to unassign: {str(e)}")
         # Redirect back to the referring URL to preserve query parameters

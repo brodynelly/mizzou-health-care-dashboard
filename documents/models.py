@@ -1,10 +1,10 @@
-from django.db import models
+import re
 
 # Create your models here.
-from django.db import models
 import uuid
-from django.utils import timezone
-import re
+
+from django.db import models
+
 
 class Drug(models.Model):
     name = models.CharField(max_length=255)
@@ -29,7 +29,7 @@ class DocumentField(models.Model):
     @property
     def snake_case_name(self):
         return re.sub(r'(?<!^)(?=[A-Z])', '_', self.name.replace(' ', '_')).lower()
-    
+
     document_type = models.ForeignKey(DocumentType, on_delete=models.CASCADE, related_name='fields')
     name = models.CharField(max_length=255)
     field_type = models.CharField(max_length=50, choices=FIELD_TYPES)
@@ -51,7 +51,7 @@ class Document(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class DocumentFieldValue(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='field_values')
     field = models.ForeignKey(DocumentField, on_delete=models.CASCADE)

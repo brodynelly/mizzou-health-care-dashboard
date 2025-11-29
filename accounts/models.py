@@ -1,6 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+
 from patients.models import Geocode
+
 
 class Role(models.Model):
     ROLE_CHOICES = (
@@ -33,6 +35,3 @@ class CustomUser(AbstractUser):
     @property
     def name(self):
         return f"{self.first_name} {self.last_name}"
-    
-    
-    

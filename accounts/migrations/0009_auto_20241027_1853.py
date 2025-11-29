@@ -2,6 +2,7 @@
 
 from django.db import migrations
 
+
 def update_customuser_fields(apps, schema_editor):
     # Get the CustomUser model using apps.get_model to avoid import issues during migration
     CustomUser = apps.get_model('accounts', 'CustomUser')

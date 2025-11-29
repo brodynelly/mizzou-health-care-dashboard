@@ -1,11 +1,12 @@
 from django.db import migrations
 
+
 def create_users(apps, schema_editor):
     # Get models through the migration system
     User = apps.get_model("accounts", "CustomUser")
     Role = apps.get_model("accounts", "Role")
     Geocode = apps.get_model("patients", "Geocode")
-    
+
     # Delete all users first
     User.objects.all().delete()
 

@@ -1,7 +1,8 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from allauth.account.forms import SignupForm
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+
 from .models import Role
 
 
@@ -20,7 +21,7 @@ class CustomUserChangeForm(UserChangeForm):
             "email",
             "username",
         )
-        
+
 class CustomSignupForm(SignupForm):
     first_name = forms.CharField(max_length=30, label='First Name', required=True)
     last_name = forms.CharField(max_length=30, label='Last Name', required=True)

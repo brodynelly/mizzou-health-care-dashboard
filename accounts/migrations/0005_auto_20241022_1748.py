@@ -2,6 +2,7 @@
 
 from django.db import migrations
 
+
 def create_roles(apps, schema_editor):
     Role = apps.get_model("accounts", "Role")
     Role.objects.get_or_create(name="doctor")
