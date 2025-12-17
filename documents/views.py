@@ -1,26 +1,29 @@
-from django.urls import reverse_lazy, path
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView, FormView, View
-from .models import Document, DocumentField, DocumentType, DocumentFieldValue, Drug
-from .forms import DocumentForm, DocumentTypeForm, DocumentFieldForm  # Import the custom form with Summernote widget
+import os
 
+from dal import autocomplete
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
-from xhtml2pdf import pisa
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
-from io import BytesIO
-from .models import Document
-from dal import autocomplete
-import os
-from django.conf import settings
-from django.db.models import Q
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
+from django.views.generic import DeleteView, DetailView, FormView, ListView, UpdateView
+from xhtml2pdf import pisa
+
+from .forms import (  # Import the custom form with Summernote widget
+    DocumentFieldForm,
+    DocumentForm,
+    DocumentTypeForm,
+)
+from .models import Document, DocumentField, DocumentFieldValue, DocumentType, Drug
 
 
 def generate_pdf(document):
     # Render the HTML content
     html_content = render_to_string('documents/document_pdf.html', {'document': document})
-    
+
     # Define a path to save the PDF file
     pdf_directory = os.path.join(settings.MEDIA_ROOT, 'documents/pdfs')
     pdf_path = os.path.join(pdf_directory, f'{document.title}.pdf')
@@ -32,11 +35,11 @@ def generate_pdf(document):
     # Create PDF
     with open(pdf_path, 'wb') as pdf_file:
         pisa_status = pisa.CreatePDF(html_content, dest=pdf_file)
-    
+
     # Check for errors
     if pisa_status.err:
         return None
-    
+
     return pdf_path
 
 def document_pdf_view(request, pk):
@@ -86,7 +89,7 @@ class DrugAutocompleteView(autocomplete.Select2QuerySetView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user  # Set the document owner to the logged-in user
-        
+
         # Ensure content is properly processed
         cleaned_content = form.cleaned_data.get('content', '')
         form.instance.content = cleaned_content
@@ -105,7 +108,7 @@ class DocumentListView(ListView):
 
     def get_paginate_by(self, queryset):
         items_per_page = self.request.GET.get('items_per_page', 20)
-        
+
         try:
             # Convert the value to an integer, default to 6 if conversion fails
             return int(items_per_page)
@@ -149,13 +152,13 @@ class DocumentListView(ListView):
         context = super().get_context_data(**kwargs)
         # Include document types for filter options
         context['document_types'] = DocumentType.objects.all()
-        
+
         # Keep the filter, sort, and items per page values for pagination links
         context['q'] = self.request.GET.get('q', '')
         context['filter'] = self.request.GET.get('filter', '')
         context['sort'] = self.request.GET.get('sort', 'title')
         context['items_per_page'] = self.request.GET.get('items_per_page', 6)
-        
+
         return context
 
 # Detail View: View a single document
@@ -176,7 +179,7 @@ class DocumentUpdateView(FormView):
 
         # Set initial values for title, patient, and document fields
         kwargs['initial'] = {'title': document.title, 'patient': document.patient}
-        
+
         # Populate initial values for the document fields
         for field_value in document.field_values.all():
             if field_value.field.field_type == 'drug':
@@ -234,7 +237,7 @@ class DocumentDeleteView(DeleteView):
     model = Document
     template_name = 'documents/document_confirm_delete.html'  # Template for confirming deletion
     success_url = reverse_lazy('document_list')
-    
+
 @method_decorator(login_required, name='dispatch')
 class DocumentCreateView(FormView):
     template_name = 'documents/document_form.html'
@@ -255,7 +258,7 @@ class DocumentCreateView(FormView):
         title = form.cleaned_data.get('title', 'Untitled Document')
         patient = form.cleaned_data.get('patient')  # Get the patient from the form
         pdf_file = form.cleaned_data.get('pdf_file')  # Get the uploaded PDF file if provided
-        
+
         if not patient:
             # If patient is required, raise an error
             form.add_error('patient', 'Patient is required.')
@@ -272,7 +275,7 @@ class DocumentCreateView(FormView):
                 title=title,
                 patient=patient
             )
-            
+
             # Assign the uploaded PDF file
             document.pdf_file = pdf_file
 
@@ -330,7 +333,7 @@ class DocumentTypeCreateView(FormView):
     template_name = 'documents/document_type/document_type_create.html'
     form_class = DocumentTypeForm
     success_url = reverse_lazy('document_type_list')
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['field_form'] = DocumentFieldForm()
@@ -370,22 +373,22 @@ class DocumentTypeCreateView(FormView):
                 request.session['document_fields'] = fields
             return redirect('document_type_create')
         return super().post(request, *args, **kwargs)
-    
-    
+
+
 #List View
 @method_decorator(login_required, name='dispatch')
 class DocumentTypeListView(ListView):
     model = DocumentType
     template_name = 'documents/document_type/document_type_list.html'
     context_object_name = 'document_types'
-    
+
 # Delete View
 @method_decorator(login_required, name='dispatch')
 class DocumentTypeDeleteView(DeleteView):
     model = DocumentType
     template_name = 'documents/document_type/document_type_confirm_delete.html'
     success_url = reverse_lazy('document_type_list')
-    
+
 # Update View
 @method_decorator(login_required, name='dispatch')
 class DocumentTypeUpdateView(UpdateView):

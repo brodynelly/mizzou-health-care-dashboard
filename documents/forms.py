@@ -1,7 +1,8 @@
-from django import forms
-from .models import Document, DocumentField, DocumentType, Drug, DocumentFieldValue
-from django_summernote.widgets import SummernoteWidget
 from dal import autocomplete
+from django import forms
+from django_summernote.widgets import SummernoteWidget
+
+from .models import Document, DocumentField, DocumentType, Drug
 
 
 class DocumentForm(forms.ModelForm):
@@ -12,10 +13,10 @@ class DocumentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         document_type = kwargs.pop('document_type')
         super(DocumentForm, self).__init__(*args, **kwargs)
-        
+
         if document_type.id != 1001:
             self.fields.pop('pdf_file', None)
-    
+
         # Add fields based on DocumentType fields
         for field in document_type.fields.all():
             if field.field_type == 'text':
@@ -33,7 +34,7 @@ class DocumentForm(forms.ModelForm):
                     queryset=Drug.objects.all(),
                     widget=autocomplete.ModelSelect2(
                         url='drug_autocomplete',
-                    ),                    
+                    ),
                     required=False
                 )
 

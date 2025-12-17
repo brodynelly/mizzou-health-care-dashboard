@@ -1,6 +1,19 @@
-from django.contrib import admin
-from django.urls import path, include
-from .views import DocumentCreateView, DocumentListView, DocumentDetailView, DocumentUpdateView, DocumentDeleteView, document_pdf_view, DocumentTypeCreateView, DocumentTypeSelectView, DocumentTypeUpdateView, DocumentTypeDeleteView, DocumentTypeListView, DrugAutocompleteView
+from django.urls import path
+
+from .views import (
+    DocumentCreateView,
+    DocumentDeleteView,
+    DocumentDetailView,
+    DocumentListView,
+    DocumentTypeCreateView,
+    DocumentTypeDeleteView,
+    DocumentTypeListView,
+    DocumentTypeSelectView,
+    DocumentTypeUpdateView,
+    DocumentUpdateView,
+    DrugAutocompleteView,
+    document_pdf_view,
+)
 
 urlpatterns = [
     path('documents/', DocumentListView.as_view(), name='document_list'),  # List all documents

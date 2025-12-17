@@ -2,6 +2,7 @@
 
 from django.db import migrations
 
+
 def create_superuser(apps, schema_editor):
     # Get the user model
     User = apps.get_model('accounts', 'CustomUser')

@@ -1,6 +1,14 @@
-from django.contrib import admin
-from django.urls import path, include
-from .views import PatientCreateView, PatientListView, PatientDeleteView, PatientDetailView, PatientUpdateView, ICareBoardView, MyBoardView
+from django.urls import path
+
+from .views import (
+    ICareBoardView,
+    MyBoardView,
+    PatientCreateView,
+    PatientDeleteView,
+    PatientDetailView,
+    PatientListView,
+    PatientUpdateView,
+)
 
 urlpatterns = [
     path('list/', PatientListView.as_view(), name='patient_list'),

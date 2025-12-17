@@ -2,6 +2,7 @@
 
 from django.db import migrations
 
+
 def create_upload_pdf_document_type(apps, schema_editor):
     DocumentType = apps.get_model('documents', 'DocumentType')
     DocumentType.objects.create(id=1001, name='Upload PDF')
@@ -18,5 +19,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_upload_pdf_document_type, reverse_upload_pdf_document_type),        
+        migrations.RunPython(create_upload_pdf_document_type, reverse_upload_pdf_document_type),
     ]

@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from pathlib import Path
-from environs import Env
 import os
+from pathlib import Path
 
+from environs import Env
 
 env = Env()
 env.read_env()
@@ -70,7 +70,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",  
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 
 ]
@@ -100,7 +100,7 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": env.dj_db_url("DATABSE_URL", default="postgres://postgres@db/postgres")
+    "default": env.dj_db_url("DATABASE_URL", default="postgres://postgres@db/postgres")
 }
 
 
@@ -170,7 +170,7 @@ LOGOUT_REDIRECT_URL = "home"
 
 #all auth config
 ACCOUNT_LOGOUT_REDIRECT = "home"
-SITE_ID = 1 
+SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -191,9 +191,9 @@ ACCOUNT_USERNAME_REQUIRED = False  # Username is not required
 
 #summernote options
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/') 
-  
-# allows to load iframe from same hostname 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# allows to load iframe from same hostname
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 SUMMERNOTE_CONFIG = {

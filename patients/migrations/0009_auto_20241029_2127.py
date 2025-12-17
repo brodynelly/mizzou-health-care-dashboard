@@ -1,6 +1,7 @@
-from django.db import migrations, models
-import uuid
 from datetime import date
+
+from django.db import migrations
+
 
 def clear_all_tables(apps, schema_editor):
     Patient = apps.get_model('patients', 'Patient')
