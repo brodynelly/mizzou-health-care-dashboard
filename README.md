@@ -1,5 +1,7 @@
 # Django Project with Docker
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/brodynelly/mizzou-health-care-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/brodynelly/mizzou-health-care-dashboard/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python)
+
 This guide will help you set up and run the Django project using Docker and Docker Compose. Please follow the steps below to get started.
 
 ## Project Structure
