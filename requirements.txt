@@ -15,7 +15,7 @@ dj-email-url==1.0.6
 Django==5.1.2
 django-allauth==65.0.2
 django-autocomplete-light==3.11.0
-django-cache-url==3.4.5
+django-cache-url==3.4.6
 django-crispy-forms==2.3
 django-summernote==0.8.20.0
 environs==11.0.0
