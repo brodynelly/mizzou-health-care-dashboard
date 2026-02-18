@@ -32,7 +32,7 @@ pycparser==2.22
 pyHanko==0.25.1
 pyhanko-certvalidator==0.26.3
 pypdf==5.0.1
-python-bidi==0.6.3
+python-bidi==0.6.7
 python-dotenv==1.0.1
 PyYAML==6.0.2
 qrcode==8.0
