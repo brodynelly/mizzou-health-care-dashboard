@@ -4,6 +4,16 @@
 
 This guide will help you set up and run the Django project using Docker and Docker Compose. Please follow the steps below to get started.
 
+
+## Tech Stack
+
+- **Django 4** — Python web framework
+- **PostgreSQL** — relational database
+- **Docker / Docker Compose** — containerized development environment
+- **Ruff** — Python linter
+- **GitHub Actions** — CI/CD
+
+
 ## Project Structure
 
 This project follows a standard Django structure with some quality of life improvements:
