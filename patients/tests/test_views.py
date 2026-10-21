@@ -156,7 +156,9 @@ class PatientViewTests(TestCase):
         view = PatientUpdateView()
         view.setup(request, pk=self.patient.pk)
         view.object = Patient.objects.get(pk=self.patient.pk)
-        form = view.get_form(
+        form_class = view.get_form_class()
+        form = form_class(
+            instance=view.object,
             data={
                 "name": "Updated synthetic name",
                 "address": "Updated test address",
