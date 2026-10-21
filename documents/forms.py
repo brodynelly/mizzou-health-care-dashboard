@@ -12,7 +12,10 @@ class DocumentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         document_type = kwargs.pop('document_type')
+        patient_queryset = kwargs.pop('patient_queryset', None)
         super(DocumentForm, self).__init__(*args, **kwargs)
+        if patient_queryset is not None:
+            self.fields['patient'].queryset = patient_queryset
 
         if document_type.id != 1001:
             self.fields.pop('pdf_file', None)

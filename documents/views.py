@@ -3,6 +3,7 @@ import os
 from dal import autocomplete
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -18,6 +19,20 @@ from .forms import (  # Import the custom form with Summernote widget
     DocumentTypeForm,
 )
 from .models import Document, DocumentField, DocumentFieldValue, DocumentType, Drug
+from patients.access import get_authorized_unit_id
+from patients.models import Patient
+
+
+def _authorized_patients(user):
+    unit_id = get_authorized_unit_id(user)
+    return Patient.objects.filter(
+        geocode_id=unit_id,
+        treated_by=user,
+    ).distinct()
+
+
+def _authorized_documents(user):
+    return Document.objects.filter(patient__in=_authorized_patients(user))
 
 
 def generate_pdf(document):
@@ -42,9 +57,10 @@ def generate_pdf(document):
 
     return pdf_path
 
+@login_required
 def document_pdf_view(request, pk):
     # Get the document instance
-    document = get_object_or_404(Document, pk=pk)
+    document = get_object_or_404(_authorized_documents(request.user), pk=pk)
 
     # Check if the document has an uploaded PDF
     if document.is_uploaded_pdf and document.pdf_file and os.path.exists(document.pdf_file.path):
@@ -117,8 +133,7 @@ class DocumentListView(ListView):
             return 20
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.filter(patient__treated_by=self.request.user)
+        queryset = _authorized_documents(self.request.user)
 
         # Search functionality
         query = self.request.GET.get('q')
@@ -166,6 +181,9 @@ class DocumentListView(ListView):
 class DocumentDetailView(DetailView):
     model = Document
     template_name = 'documents/document_detail.html'  # Template for viewing a document
+
+    def get_queryset(self):
+        return _authorized_documents(self.request.user)
 # Update View: Edit an existing document
 @method_decorator(login_required, name='dispatch')
 class DocumentUpdateView(FormView):
@@ -174,8 +192,11 @@ class DocumentUpdateView(FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        document = Document.objects.get(pk=self.kwargs['pk'])
+        document = get_object_or_404(
+            _authorized_documents(self.request.user), pk=self.kwargs['pk']
+        )
         kwargs['document_type'] = document.document_type
+        kwargs['patient_queryset'] = _authorized_patients(self.request.user)
 
         # Set initial values for title, patient, and document fields
         kwargs['initial'] = {'title': document.title, 'patient': document.patient}
@@ -201,9 +222,13 @@ class DocumentUpdateView(FormView):
         return DocumentForm(**self.get_form_kwargs())
 
     def form_valid(self, form):
-        document = Document.objects.get(pk=self.kwargs['pk'])
+        document = get_object_or_404(
+            _authorized_documents(self.request.user), pk=self.kwargs['pk']
+        )
         document.title = form.cleaned_data.get('title', 'Untitled Document')
         document.patient = form.cleaned_data.get('patient')  # Update the patient field
+        if document.patient not in _authorized_patients(self.request.user):
+            raise PermissionDenied
 
         # Update the PDF file if it has changed
         if 'pdf_file' in form.cleaned_data and form.cleaned_data['pdf_file']:
@@ -238,6 +263,9 @@ class DocumentDeleteView(DeleteView):
     template_name = 'documents/document_confirm_delete.html'  # Template for confirming deletion
     success_url = reverse_lazy('document_list')
 
+    def get_queryset(self):
+        return _authorized_documents(self.request.user)
+
 @method_decorator(login_required, name='dispatch')
 class DocumentCreateView(FormView):
     template_name = 'documents/document_form.html'
@@ -247,6 +275,7 @@ class DocumentCreateView(FormView):
         kwargs = super().get_form_kwargs()
         document_type = DocumentType.objects.get(pk=self.kwargs['document_type_pk'])
         kwargs['document_type'] = document_type
+        kwargs['patient_queryset'] = _authorized_patients(self.request.user)
         return kwargs
 
     def get_form(self):
@@ -263,6 +292,8 @@ class DocumentCreateView(FormView):
             # If patient is required, raise an error
             form.add_error('patient', 'Patient is required.')
             return self.form_invalid(form)
+        if patient not in _authorized_patients(self.request.user):
+            raise PermissionDenied
 
         if pdf_file:
             # Log to confirm we are in the branch that uploads a PDF

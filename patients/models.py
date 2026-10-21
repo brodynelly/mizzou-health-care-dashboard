@@ -1,6 +1,6 @@
 import uuid
 
-from django.db import models
+from django.db import models, transaction
 
 
 class Patient(models.Model):
@@ -33,66 +33,74 @@ class Patient(models.Model):
         return f"{self.name}"
 
     def assign_nurse(self, nurse_user):
-        if nurse_user.role.name != 'nurse':
+        if getattr(nurse_user.role, 'name', None) != 'nurse':
             raise ValueError("User must have role 'nurse' to be assigned as a nurse.")
 
-        if self.nurse_count >= 3:
+        with transaction.atomic():
+            patient = Patient.objects.select_for_update().get(pk=self.pk)
+            self._assign_nurse_locked(patient, nurse_user)
+
+    def _assign_nurse_locked(self, patient, nurse_user):
+        if patient.nurse_count >= 3:
             raise ValueError("A patient can have no more than 3 nurses assigned.")
 
-        if TreatmentRecord.objects.filter(patient=self, worker=nurse_user).exists():
+        if TreatmentRecord.objects.filter(patient=patient, worker=nurse_user).exists():
             raise ValueError(f"{nurse_user.name} is already assigned as a nurse to this patient.")
 
-        # Create the TreatmentRecord for the nurse
-        TreatmentRecord.objects.create(patient=self, worker=nurse_user)
-        self.nurse_count += 1
-        self.state = self.DOCTOR_ASSIGNED if self.doctor_assigned else self.NURSE_ASSIGNED
-        self.save()
+        TreatmentRecord.objects.create(patient=patient, worker=nurse_user)
+        patient.nurse_count += 1
+        patient.state = self.DOCTOR_ASSIGNED if patient.doctor_assigned else self.NURSE_ASSIGNED
+        patient.save(update_fields=['nurse_count', 'state'])
+        self.nurse_count, self.state = patient.nurse_count, patient.state
 
     def assign_doctor(self, doctor_user):
-        if doctor_user.role.name != 'doctor':
+        if getattr(doctor_user.role, 'name', None) != 'doctor':
             raise ValueError("User must have role 'doctor' to be assigned as a doctor.")
 
-        if TreatmentRecord.objects.filter(patient=self, worker=doctor_user).exists():
-            raise ValueError(f"{doctor_user.name} is already assigned as a doctor to this patient.")
-
-        if self.doctor_assigned:
-            raise ValueError("A patient can have only one doctor assigned.")
-
-        if self.nurse_count == 0:
-            raise ValueError("A doctor cannot be assigned unless at least one nurse is assigned.")
-
-        # Create the TreatmentRecord for the doctor
-        TreatmentRecord.objects.create(patient=self, worker=doctor_user)
-        self.doctor_assigned = True
-        self.state = self.DOCTOR_ASSIGNED
-        self.save()
+        with transaction.atomic():
+            patient = Patient.objects.select_for_update().get(pk=self.pk)
+            if TreatmentRecord.objects.filter(patient=patient, worker=doctor_user).exists():
+                raise ValueError(f"{doctor_user.name} is already assigned as a doctor to this patient.")
+            if patient.doctor_assigned:
+                raise ValueError("A patient can have only one doctor assigned.")
+            if patient.nurse_count == 0:
+                raise ValueError("A doctor cannot be assigned unless at least one nurse is assigned.")
+            TreatmentRecord.objects.create(patient=patient, worker=doctor_user)
+            patient.doctor_assigned = True
+            patient.state = self.DOCTOR_ASSIGNED
+            patient.save(update_fields=['doctor_assigned', 'state'])
+            self.doctor_assigned, self.state = True, patient.state
 
     def unassign_nurse(self, nurse_user):
-        if nurse_user.role.name != 'nurse':
+        if getattr(nurse_user.role, 'name', None) != 'nurse':
             raise ValueError("User must have role 'nurse' to be unassigned as a nurse.")
 
-        try:
-            record = TreatmentRecord.objects.get(patient=self, worker=nurse_user)
-            record.delete()
-            self.nurse_count -= 1
-            if self.nurse_count == 0:
-                self.state = self.UNASSIGNED if not self.doctor_assigned else self.DOCTOR_ASSIGNED
-            self.save()
-        except TreatmentRecord.DoesNotExist:
-            raise ValueError("This nurse is not assigned to the patient.")
+        with transaction.atomic():
+            patient = Patient.objects.select_for_update().get(pk=self.pk)
+            try:
+                TreatmentRecord.objects.get(patient=patient, worker=nurse_user).delete()
+            except TreatmentRecord.DoesNotExist:
+                raise ValueError("This nurse is not assigned to the patient.")
+            patient.nurse_count -= 1
+            if patient.nurse_count == 0:
+                patient.state = self.UNASSIGNED if not patient.doctor_assigned else self.DOCTOR_ASSIGNED
+            patient.save(update_fields=['nurse_count', 'state'])
+            self.nurse_count, self.state = patient.nurse_count, patient.state
 
     def unassign_doctor(self, doctor_user):
-        if doctor_user.role.name != 'doctor':
+        if getattr(doctor_user.role, 'name', None) != 'doctor':
             raise ValueError("User must have role 'doctor' to be unassigned as a doctor.")
 
-        try:
-            record = TreatmentRecord.objects.get(patient=self, worker=doctor_user)
-            record.delete()
-            self.doctor_assigned = False
-            self.state = self.NURSE_ASSIGNED if self.nurse_count > 0 else self.UNASSIGNED
-            self.save()
-        except TreatmentRecord.DoesNotExist:
-            raise ValueError("This doctor is not assigned to the patient.")
+        with transaction.atomic():
+            patient = Patient.objects.select_for_update().get(pk=self.pk)
+            try:
+                TreatmentRecord.objects.get(patient=patient, worker=doctor_user).delete()
+            except TreatmentRecord.DoesNotExist:
+                raise ValueError("This doctor is not assigned to the patient.")
+            patient.doctor_assigned = False
+            patient.state = self.NURSE_ASSIGNED if patient.nurse_count > 0 else self.UNASSIGNED
+            patient.save(update_fields=['doctor_assigned', 'state'])
+            self.doctor_assigned, self.state = False, patient.state
 
 
 
