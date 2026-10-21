@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -25,6 +26,13 @@ class PatientCreateView(CreateView):
     template_name = 'patients/patient_form.html'
     success_url = reverse_lazy('patient_list')
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['geocode'].queryset = Geocode.objects.filter(
+            id=self.request.user.primary_geocode_id
+        ) if self.request.user.primary_geocode_id else Geocode.objects.none()
+        return form
+
 # Read/List View with pagination, search, filter, and sort
 @method_decorator(login_required, name='dispatch')
 class PatientListView(ListView):
@@ -42,6 +50,9 @@ class PatientListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if not self.request.user.primary_geocode_id:
+            return queryset.none()
+        queryset = queryset.filter(geocode_id=self.request.user.primary_geocode_id)
         search_query = self.request.GET.get('search', '')
         sort_by = self.request.GET.get('sort', 'name')
         treatment_state = self.request.GET.get('treatment_state', '')
@@ -82,6 +93,9 @@ class PatientDetailView(DetailView):
     template_name = 'patients/patient_detail.html'
     context_object_name = 'patient'
 
+    def get_queryset(self):
+        return Patient.objects.filter(geocode_id=self.request.user.primary_geocode_id) if self.request.user.primary_geocode_id else Patient.objects.none()
+
 # Update View
 @method_decorator(login_required, name='dispatch')
 class PatientUpdateView(UpdateView):
@@ -90,12 +104,18 @@ class PatientUpdateView(UpdateView):
     template_name = 'patients/patient_form.html'
     success_url = reverse_lazy('patient_list')
 
+    def get_queryset(self):
+        return Patient.objects.filter(geocode_id=self.request.user.primary_geocode_id) if self.request.user.primary_geocode_id else Patient.objects.none()
+
 # Delete View
 @method_decorator(login_required, name='dispatch')
 class PatientDeleteView(DeleteView):
     model = Patient
     template_name = 'patients/patient_confirm_delete.html'
     success_url = reverse_lazy('patient_list')
+
+    def get_queryset(self):
+        return Patient.objects.filter(geocode_id=self.request.user.primary_geocode_id) if self.request.user.primary_geocode_id else Patient.objects.none()
 
 #Icare View aka View Patient by geocode
 @method_decorator(login_required, name='dispatch')
@@ -116,8 +136,10 @@ class ICareBoardView(ListView):
     def get_queryset(self):
         geocode_id = self.kwargs.get('geocode_id')
         if geocode_id:
+            if str(geocode_id) != str(self.request.user.primary_geocode_id):
+                raise PermissionDenied
             geocode = get_object_or_404(Geocode, id=geocode_id)
-        elif self.request.user.is_authenticated and self.request.user.primary_geocode:
+        elif not geocode_id and self.request.user.primary_geocode:
             geocode = self.request.user.primary_geocode
         else:
             geocode = None
@@ -176,18 +198,20 @@ class ICareBoardView(ListView):
             patient.can_unassign = patient.is_assigned_to_user
 
         context['geocode'] = self.geocode
-        context['other_geocodes'] = Geocode.objects.exclude(id=self.geocode.id) if self.geocode else Geocode.objects.all()
+        context['other_geocodes'] = Geocode.objects.none()
         context['search_query'] = self.request.GET.get('search', '')
         context['sort_by'] = self.request.GET.get('sort', 'name')
         context['paginate_by'] = self.get_paginate_by(self.get_queryset())  # Add paginate_by to the context
         return context
 
     def post(self, request, *args, **kwargs):
+        if request.user.role is None or request.user.role.name not in {'doctor', 'nurse'}:
+            raise PermissionDenied
         patient_id = request.POST.get('patient_id')
         action = request.POST.get('action')
-        patient = get_object_or_404(Patient, id=patient_id)
-
-        print(f"Post action: {action}, User: {request.user}, Patient ID: {patient_id}")
+        patient = get_object_or_404(
+            Patient, id=patient_id, geocode_id=request.user.primary_geocode_id
+        )
 
         try:
             if action == 'assign':
@@ -264,8 +288,11 @@ class MyBoardView(ListView):
     def post(self, request, *args, **kwargs):
         # Get the patient ID from the form data
         patient_id = request.POST.get('patient_id')
-        patient = get_object_or_404(Patient, id=patient_id)
         user = request.user
+        patient = get_object_or_404(
+            Patient.objects.filter(treatmentrecord__worker=user).distinct(),
+            id=patient_id,
+        )
 
         try:
             # Unassign the doctor if the user is a doctor
