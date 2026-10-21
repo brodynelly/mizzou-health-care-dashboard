@@ -26,18 +26,20 @@ from documents.views import DrugAutocompleteView
 urlpatterns = [
     path("", include("pages.urls")),
     path("", include("documents.urls")),
-
-    #user management
-    path('accounts/', include('allauth.urls')),  # Include all other AllAuth URLs
+    # user management
+    path("accounts/", include("allauth.urls")),  # Include all other AllAuth URLs
     path("admin/", admin.site.urls),
-    #patient management
+    # patient management
     path("patient/", include("patients.urls")),
-    path('editor/', include('django_summernote.urls')),
-    path('summernote/', include('django_summernote.urls')),
-    path('api/drug-autocomplete/', DrugAutocompleteView.as_view(), name='drug_autocomplete'),
-    path('user/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
-
+    path("editor/", include("django_summernote.urls")),
+    path("summernote/", include("django_summernote.urls")),
+    path(
+        "api/drug-autocomplete/",
+        DrugAutocompleteView.as_view(),
+        name="drug_autocomplete",
+    ),
+    path("user/<int:pk>/", UserDetailView.as_view(), name="user_detail"),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,20 +5,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0012_alter_patient_treated_by_and_more'),
+        ("patients", "0012_alter_patient_treated_by_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='treatmentrecord',
-            name='patient',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='treatment', to='patients.patient'),
+            model_name="treatmentrecord",
+            name="patient",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="treatment",
+                to="patients.patient",
+            ),
         ),
         migrations.AlterField(
-            model_name='patient',
-            name='treated_by',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='patient_record', to='patients.treatmentrecord'),
+            model_name="patient",
+            name="treated_by",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="patient_record",
+                to="patients.treatmentrecord",
+            ),
         ),
     ]

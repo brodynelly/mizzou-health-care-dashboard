@@ -8,13 +8,13 @@ from django.db import migrations
 
 def create_sample_data(apps, schema_editor):
     # Get the models using apps.get_model to avoid import issues during migration
-    Geocode = apps.get_model('patients', 'Geocode')
-    Patient = apps.get_model('patients', 'Patient')
-    UserPatientAssignment = apps.get_model('patients', 'UserPatientAssignment')
-    CustomUser = apps.get_model('accounts', 'CustomUser')
+    Geocode = apps.get_model("patients", "Geocode")
+    Patient = apps.get_model("patients", "Patient")
+    UserPatientAssignment = apps.get_model("patients", "UserPatientAssignment")
+    CustomUser = apps.get_model("accounts", "CustomUser")
 
     # Get the user with the first name "Admin"
-    user = CustomUser.objects.filter(first_name='Admin').first()
+    user = CustomUser.objects.filter(first_name="Admin").first()
 
     # Check if user exists (as this is for sample data, ensure there's an "Admin" user)
     if user is None:
@@ -31,100 +31,100 @@ def create_sample_data(apps, schema_editor):
     patients = [
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='John Doe',
-            address='123 Main St',
+            name="John Doe",
+            address="123 Main St",
             date_of_birth=date(1990, 1, 1),
             height=70.00,
             weight=150.00,
-            blood_group='O+',
-            bed_id='B123',
-            treatment_area='Cardiology',
-            geocode=geocode_1
+            blood_group="O+",
+            bed_id="B123",
+            treatment_area="Cardiology",
+            geocode=geocode_1,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Jane Smith',
-            address='456 Elm St',
+            name="Jane Smith",
+            address="456 Elm St",
             date_of_birth=date(1985, 5, 5),
             height=65.00,
             weight=130.00,
-            blood_group='A-',
-            bed_id='B124',
-            treatment_area='Orthopedics',
-            geocode=geocode_1
+            blood_group="A-",
+            bed_id="B124",
+            treatment_area="Orthopedics",
+            geocode=geocode_1,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Alice Johnson',
-            address='789 Oak St',
+            name="Alice Johnson",
+            address="789 Oak St",
             date_of_birth=date(1975, 3, 15),
             height=68.00,
             weight=160.00,
-            blood_group='B+',
-            bed_id='B125',
-            treatment_area='Neurology',
-            geocode=geocode_2
+            blood_group="B+",
+            bed_id="B125",
+            treatment_area="Neurology",
+            geocode=geocode_2,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Bob Brown',
-            address='101 Pine St',
+            name="Bob Brown",
+            address="101 Pine St",
             date_of_birth=date(1992, 8, 21),
             height=72.00,
             weight=180.00,
-            blood_group='AB+',
-            bed_id='B126',
-            treatment_area='Dermatology',
-            geocode=geocode_2
+            blood_group="AB+",
+            bed_id="B126",
+            treatment_area="Dermatology",
+            geocode=geocode_2,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Charlie Green',
-            address='202 Cedar St',
+            name="Charlie Green",
+            address="202 Cedar St",
             date_of_birth=date(1988, 11, 11),
             height=69.00,
             weight=155.00,
-            blood_group='O-',
-            bed_id='B127',
-            treatment_area='Oncology',
-            geocode=geocode_1
+            blood_group="O-",
+            bed_id="B127",
+            treatment_area="Oncology",
+            geocode=geocode_1,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Diana White',
-            address='303 Maple St',
+            name="Diana White",
+            address="303 Maple St",
             date_of_birth=date(1979, 4, 4),
             height=67.00,
             weight=140.00,
-            blood_group='B-',
-            bed_id='B128',
-            treatment_area='Pediatrics',
-            geocode=geocode_2
+            blood_group="B-",
+            bed_id="B128",
+            treatment_area="Pediatrics",
+            geocode=geocode_2,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Edward Black',
-            address='404 Oak St',
+            name="Edward Black",
+            address="404 Oak St",
             date_of_birth=date(1965, 2, 19),
             height=71.00,
             weight=170.00,
-            blood_group='A+',
-            bed_id='B129',
-            treatment_area='Gastroenterology',
-            geocode=geocode_1
+            blood_group="A+",
+            bed_id="B129",
+            treatment_area="Gastroenterology",
+            geocode=geocode_1,
         ),
         Patient.objects.create(
             id=uuid.uuid4(),
-            name='Fiona Blue',
-            address='505 Birch St',
+            name="Fiona Blue",
+            address="505 Birch St",
             date_of_birth=date(1995, 7, 30),
             height=64.00,
             weight=120.00,
-            blood_group='AB-',
-            bed_id='B130',
-            treatment_area='ENT',
-            geocode=geocode_2
-        )
+            blood_group="AB-",
+            bed_id="B130",
+            treatment_area="ENT",
+            geocode=geocode_2,
+        ),
     ]
 
     # Assign patients to the current user
@@ -133,7 +133,6 @@ def create_sample_data(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("patients", "0006_userpatientassignment"),
     ]

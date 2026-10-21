@@ -6,15 +6,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0004_alter_document_content'),
+        ("documents", "0004_alter_document_content"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='creation_date',
-            field=models.DateTimeField(default=datetime.datetime(2024, 10, 24, 15, 39, 26, 364852, tzinfo=datetime.timezone.utc)),
+            model_name="document",
+            name="creation_date",
+            field=models.DateTimeField(
+                default=datetime.datetime(
+                    2024, 10, 24, 15, 39, 26, 364852, tzinfo=datetime.timezone.utc
+                )
+            ),
         ),
     ]

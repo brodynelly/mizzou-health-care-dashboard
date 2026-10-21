@@ -4,20 +4,26 @@ from django.db import migrations
 
 
 def generate_drugs(apps, schema_editor):
-    Drug = apps.get_model('documents', 'Drug')
+    Drug = apps.get_model("documents", "Drug")
     drugs = [
-        'Aspirin', 'Ibuprofen', 'Paracetamol', 'Amoxicillin', 'Metformin',
-        'Simvastatin', 'Omeprazole', 'Ciprofloxacin', 'Losartan', 'Amlodipine'
+        "Aspirin",
+        "Ibuprofen",
+        "Paracetamol",
+        "Amoxicillin",
+        "Metformin",
+        "Simvastatin",
+        "Omeprazole",
+        "Ciprofloxacin",
+        "Losartan",
+        "Amlodipine",
     ]
     for drug in drugs:
         Drug.objects.create(name=drug)
 
+
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0009_drug_alter_documentfield_field_type'),
+        ("documents", "0009_drug_alter_documentfield_field_type"),
     ]
 
-    operations = [
-        migrations.RunPython(generate_drugs)
-    ]
+    operations = [migrations.RunPython(generate_drugs)]

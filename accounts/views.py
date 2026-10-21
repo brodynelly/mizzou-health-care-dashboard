@@ -20,7 +20,8 @@ class SuperuserSignupView(LoginRequiredMixin, UserPassesTestMixin, SignupView):
         # Only allow superusers to access the view
         return self.request.user.is_superuser
 
+
 class UserDetailView(DetailView):
     model = CustomUser
-    template_name = 'user_detail.html'  # Template for listing documents
-    context_object_name = 'user'
+    template_name = "user_detail.html"  # Template for listing documents
+    context_object_name = "user"

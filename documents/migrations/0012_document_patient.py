@@ -5,16 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0011_remove_document_content'),
-        ('patients', '0006_userpatientassignment'),
+        ("documents", "0011_remove_document_content"),
+        ("patients", "0006_userpatientassignment"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='patient',
-            field=models.ForeignKey(default='b4fda812-35d6-4205-8dcd-6abb585160f6', on_delete=django.db.models.deletion.CASCADE, to='patients.patient'),
+            model_name="document",
+            name="patient",
+            field=models.ForeignKey(
+                default="b4fda812-35d6-4205-8dcd-6abb585160f6",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="patients.patient",
+            ),
         ),
     ]

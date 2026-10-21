@@ -5,16 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0012_document_patient'),
-        ('patients', '0006_userpatientassignment'),
+        ("documents", "0012_document_patient"),
+        ("patients", "0006_userpatientassignment"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='patient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='documents', to='patients.patient'),
+            model_name="document",
+            name="patient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="documents",
+                to="patients.patient",
+            ),
         ),
     ]

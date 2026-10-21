@@ -5,24 +5,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0015_remove_treatmentrecord_assigned_nurses_and_more'),
+        ("patients", "0015_remove_treatmentrecord_assigned_nurses_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='treatmentrecord',
-            name='assigned_nurses',
-            field=models.ManyToManyField(related_name='assigned_nurses', to=settings.AUTH_USER_MODEL),
+            model_name="treatmentrecord",
+            name="assigned_nurses",
+            field=models.ManyToManyField(
+                related_name="assigned_nurses", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='treatmentrecord',
-            name='num_of_nurses',
+            model_name="treatmentrecord",
+            name="num_of_nurses",
             field=models.IntegerField(default=0),
         ),
         migrations.DeleteModel(
-            name='NurseAssignment',
+            name="NurseAssignment",
         ),
     ]

@@ -5,18 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0011_alter_patient_treated_by'),
+        ("patients", "0011_alter_patient_treated_by"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='patient',
-            name='treated_by',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='patient', to='patients.treatmentrecord'),
+            model_name="patient",
+            name="treated_by",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="patient",
+                to="patients.treatmentrecord",
+            ),
         ),
         migrations.DeleteModel(
-            name='UserPatientAssignment',
+            name="UserPatientAssignment",
         ),
     ]

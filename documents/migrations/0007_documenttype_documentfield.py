@@ -5,26 +5,59 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0006_alter_document_creation_date'),
+        ("documents", "0006_alter_document_creation_date"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DocumentType',
+            name="DocumentType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='DocumentField',
+            name="DocumentField",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('field_type', models.CharField(choices=[('text', 'Text'), ('number', 'Number'), ('date', 'Date'), ('rich_text', 'Rich Text')], max_length=50)),
-                ('document_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='fields', to='documents.documenttype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "field_type",
+                    models.CharField(
+                        choices=[
+                            ("text", "Text"),
+                            ("number", "Number"),
+                            ("date", "Date"),
+                            ("rich_text", "Rich Text"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "document_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="fields",
+                        to="documents.documenttype",
+                    ),
+                ),
             ],
         ),
     ]

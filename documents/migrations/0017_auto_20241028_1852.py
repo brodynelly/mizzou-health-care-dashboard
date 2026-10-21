@@ -4,20 +4,22 @@ from django.db import migrations
 
 
 def create_upload_pdf_document_type(apps, schema_editor):
-    DocumentType = apps.get_model('documents', 'DocumentType')
-    DocumentType.objects.create(id=1001, name='Upload PDF')
+    DocumentType = apps.get_model("documents", "DocumentType")
+    DocumentType.objects.create(id=1001, name="Upload PDF")
 
 
 def reverse_upload_pdf_document_type(apps, schema_editor):
-    DocumentType = apps.get_model('documents', 'DocumentType')
+    DocumentType = apps.get_model("documents", "DocumentType")
     DocumentType.objects.filter(id=1001).delete()
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('documents', '0016_document_is_uploaded_pdf'),
+        ("documents", "0016_document_is_uploaded_pdf"),
     ]
 
     operations = [
-        migrations.RunPython(create_upload_pdf_document_type, reverse_upload_pdf_document_type),
+        migrations.RunPython(
+            create_upload_pdf_document_type, reverse_upload_pdf_document_type
+        ),
     ]

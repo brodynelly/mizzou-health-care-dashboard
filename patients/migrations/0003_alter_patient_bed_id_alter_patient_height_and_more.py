@@ -8,51 +8,124 @@ from django.db import migrations, models
 
 # Migration file to create initial patients
 def create_patients(apps, schema_editor):
-    Patient = apps.get_model('patients', 'Patient')
+    Patient = apps.get_model("patients", "Patient")
     patients = [
-        Patient(name="John Doe", address="123 Elm Street", date_of_birth=datetime.date(1980, 5, 15), height=70, weight=180, blood_group="O+", bed_id="B101", treatment_area="Cardiology"),
-        Patient(name="Jane Smith", address="456 Oak Avenue", date_of_birth=datetime.date(1990, 7, 20), height=65, weight=150, blood_group="A-", bed_id="B102", treatment_area="Neurology"),
-        Patient(name="Charlie Brown", address="789 Pine Lane", date_of_birth=datetime.date(1975, 3, 10), height=68, weight=160, blood_group="B+", bed_id="B103", treatment_area="Orthopedics"),
-        Patient(name="Alice Wonderland", address="101 Maple Drive", date_of_birth=datetime.date(1985, 11, 5), height=62, weight=130, blood_group="AB-", bed_id="B104", treatment_area="Pediatrics"),
-        Patient(name="Bruce Wayne", address="Wayne Manor", date_of_birth=datetime.date(1972, 2, 19), height=74, weight=210, blood_group="A+", bed_id="B105", treatment_area="Oncology"),
-        Patient(name="Clark Kent", address="Kent Farm", date_of_birth=datetime.date(1983, 6, 18), height=76, weight=220, blood_group="B-", bed_id="B106", treatment_area="General Medicine"),
-        Patient(name="Diana Prince", address="Themyscira", date_of_birth=datetime.date(1988, 4, 23), height=70, weight=170, blood_group="AB+", bed_id="B107", treatment_area="Gynecology"),
-        Patient(name="Peter Parker", address="20 Ingram Street", date_of_birth=datetime.date(1995, 8, 10), height=67, weight=155, blood_group="O-", bed_id="B108", treatment_area="Dermatology"),
+        Patient(
+            name="John Doe",
+            address="123 Elm Street",
+            date_of_birth=datetime.date(1980, 5, 15),
+            height=70,
+            weight=180,
+            blood_group="O+",
+            bed_id="B101",
+            treatment_area="Cardiology",
+        ),
+        Patient(
+            name="Jane Smith",
+            address="456 Oak Avenue",
+            date_of_birth=datetime.date(1990, 7, 20),
+            height=65,
+            weight=150,
+            blood_group="A-",
+            bed_id="B102",
+            treatment_area="Neurology",
+        ),
+        Patient(
+            name="Charlie Brown",
+            address="789 Pine Lane",
+            date_of_birth=datetime.date(1975, 3, 10),
+            height=68,
+            weight=160,
+            blood_group="B+",
+            bed_id="B103",
+            treatment_area="Orthopedics",
+        ),
+        Patient(
+            name="Alice Wonderland",
+            address="101 Maple Drive",
+            date_of_birth=datetime.date(1985, 11, 5),
+            height=62,
+            weight=130,
+            blood_group="AB-",
+            bed_id="B104",
+            treatment_area="Pediatrics",
+        ),
+        Patient(
+            name="Bruce Wayne",
+            address="Wayne Manor",
+            date_of_birth=datetime.date(1972, 2, 19),
+            height=74,
+            weight=210,
+            blood_group="A+",
+            bed_id="B105",
+            treatment_area="Oncology",
+        ),
+        Patient(
+            name="Clark Kent",
+            address="Kent Farm",
+            date_of_birth=datetime.date(1983, 6, 18),
+            height=76,
+            weight=220,
+            blood_group="B-",
+            bed_id="B106",
+            treatment_area="General Medicine",
+        ),
+        Patient(
+            name="Diana Prince",
+            address="Themyscira",
+            date_of_birth=datetime.date(1988, 4, 23),
+            height=70,
+            weight=170,
+            blood_group="AB+",
+            bed_id="B107",
+            treatment_area="Gynecology",
+        ),
+        Patient(
+            name="Peter Parker",
+            address="20 Ingram Street",
+            date_of_birth=datetime.date(1995, 8, 10),
+            height=67,
+            weight=155,
+            blood_group="O-",
+            bed_id="B108",
+            treatment_area="Dermatology",
+        ),
     ]
     Patient.objects.bulk_create(patients)
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('patients', '0002_alter_patient_id'),
+        ("patients", "0002_alter_patient_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='patient',
-            name='bed_id',
+            model_name="patient",
+            name="bed_id",
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(
-            model_name='patient',
-            name='height',
+            model_name="patient",
+            name="height",
             field=models.DecimalField(decimal_places=2, max_digits=5),
         ),
         migrations.AlterField(
-            model_name='patient',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+            model_name="patient",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='patient',
-            name='treatment_area',
+            model_name="patient",
+            name="treatment_area",
             field=models.CharField(max_length=100),
         ),
         migrations.AlterField(
-            model_name='patient',
-            name='weight',
+            model_name="patient",
+            name="weight",
             field=models.DecimalField(decimal_places=2, max_digits=6),
         ),
         migrations.RunPython(create_patients),
-
     ]
