@@ -65,6 +65,23 @@ class PatientViewTests(TestCase):
         response = self.client.get(reverse("patient_detail", args=[outside.id]))
         self.assertEqual(response.status_code, 404)
 
+    def test_patient_edit_and_delete_reject_other_geocode(self):
+        outside = Patient.objects.create(
+            name="Synthetic outside patient",
+            address="Test address",
+            date_of_birth=date(1990, 1, 1),
+            height=70,
+            weight=180,
+            blood_group="O+",
+            bed_id="B2",
+            treatment_area="ICU",
+            geocode=self.other_geocode,
+        )
+        for route_name in ("patient_edit", "patient_delete"):
+            with self.subTest(route=route_name):
+                response = self.client.get(reverse(route_name, args=[outside.id]))
+                self.assertEqual(response.status_code, 404)
+
     def test_patient_list_only_includes_primary_geocode(self):
         Patient.objects.create(
             name="Synthetic outside patient",
@@ -103,6 +120,25 @@ class PatientViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertFalse(TreatmentRecord.objects.filter(patient=self.patient).exists())
+
+    def test_care_board_assignment_rejects_other_unit_patient(self):
+        outside = Patient.objects.create(
+            name="Synthetic outside patient",
+            address="Test address",
+            date_of_birth=date(1990, 1, 1),
+            height=70,
+            weight=180,
+            blood_group="O+",
+            bed_id="B2",
+            treatment_area="ICU",
+            geocode=self.other_geocode,
+        )
+        response = self.client.post(
+            reverse("icare_board"),
+            {"patient_id": str(outside.id), "action": "assign"},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(TreatmentRecord.objects.filter(patient=outside).exists())
 
     def test_patient_creation_rejects_user_without_unit(self):
         unscoped_user = CustomUser.objects.create_user(
