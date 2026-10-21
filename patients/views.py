@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -14,9 +15,11 @@ from django.views.generic import (
     UpdateView,
 )
 
+from .access import get_authorized_unit_id
 from .models import Geocode, Patient, TreatmentRecord
 
 CustomUser = get_user_model()
+
 
 #Create View
 @method_decorator(login_required, name='dispatch')
@@ -27,10 +30,10 @@ class PatientCreateView(CreateView):
     success_url = reverse_lazy('patient_list')
 
     def get_form(self, form_class=None):
+        unit_id = get_authorized_unit_id(self.request.user)
         form = super().get_form(form_class)
-        form.fields['geocode'].queryset = Geocode.objects.filter(
-            id=self.request.user.primary_geocode_id
-        ) if self.request.user.primary_geocode_id else Geocode.objects.none()
+        form.fields['geocode'].required = True
+        form.fields['geocode'].queryset = Geocode.objects.filter(id=unit_id)
         return form
 
 # Read/List View with pagination, search, filter, and sort
@@ -50,9 +53,7 @@ class PatientListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not self.request.user.primary_geocode_id:
-            return queryset.none()
-        queryset = queryset.filter(geocode_id=self.request.user.primary_geocode_id)
+        queryset = queryset.filter(geocode_id=get_authorized_unit_id(self.request.user))
         search_query = self.request.GET.get('search', '')
         sort_by = self.request.GET.get('sort', 'name')
         treatment_state = self.request.GET.get('treatment_state', '')
@@ -94,7 +95,7 @@ class PatientDetailView(DetailView):
     context_object_name = 'patient'
 
     def get_queryset(self):
-        return Patient.objects.filter(geocode_id=self.request.user.primary_geocode_id) if self.request.user.primary_geocode_id else Patient.objects.none()
+        return Patient.objects.filter(geocode_id=get_authorized_unit_id(self.request.user))
 
 # Update View
 @method_decorator(login_required, name='dispatch')
@@ -105,7 +106,13 @@ class PatientUpdateView(UpdateView):
     success_url = reverse_lazy('patient_list')
 
     def get_queryset(self):
-        return Patient.objects.filter(geocode_id=self.request.user.primary_geocode_id) if self.request.user.primary_geocode_id else Patient.objects.none()
+        return Patient.objects.filter(geocode_id=get_authorized_unit_id(self.request.user))
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.save(update_fields=self.fields)
+        form.save_m2m()
+        return HttpResponseRedirect(self.get_success_url())
 
 # Delete View
 @method_decorator(login_required, name='dispatch')
@@ -115,7 +122,7 @@ class PatientDeleteView(DeleteView):
     success_url = reverse_lazy('patient_list')
 
     def get_queryset(self):
-        return Patient.objects.filter(geocode_id=self.request.user.primary_geocode_id) if self.request.user.primary_geocode_id else Patient.objects.none()
+        return Patient.objects.filter(geocode_id=get_authorized_unit_id(self.request.user))
 
 #Icare View aka View Patient by geocode
 @method_decorator(login_required, name='dispatch')
@@ -134,12 +141,13 @@ class ICareBoardView(ListView):
             return self.paginate_by
 
     def get_queryset(self):
+        unit_id = get_authorized_unit_id(self.request.user)
         geocode_id = self.kwargs.get('geocode_id')
         if geocode_id:
-            if str(geocode_id) != str(self.request.user.primary_geocode_id):
+            if str(geocode_id) != str(unit_id):
                 raise PermissionDenied
             geocode = get_object_or_404(Geocode, id=geocode_id)
-        elif not geocode_id and self.request.user.primary_geocode:
+        elif self.request.user.primary_geocode:
             geocode = self.request.user.primary_geocode
         else:
             geocode = None
@@ -205,12 +213,11 @@ class ICareBoardView(ListView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if request.user.role is None or request.user.role.name not in {'doctor', 'nurse'}:
-            raise PermissionDenied
+        unit_id = get_authorized_unit_id(request.user)
         patient_id = request.POST.get('patient_id')
         action = request.POST.get('action')
         patient = get_object_or_404(
-            Patient, id=patient_id, geocode_id=request.user.primary_geocode_id
+            Patient, id=patient_id, geocode_id=unit_id
         )
 
         try:
@@ -256,11 +263,14 @@ class MyBoardView(ListView):
 
     def get_queryset(self):
             user = self.request.user  # Access the current user
+            unit_id = get_authorized_unit_id(user)
 
             if user.is_authenticated:
                 # Retrieve all patients assigned to the current user through TreatmentRecord
                 assigned_patients = Patient.objects.filter(
-                    treatmentrecord__worker=user).distinct()  # Use distinct() to avoid duplicates
+                    treatmentrecord__worker=user,
+                    geocode_id=unit_id,
+                ).distinct()
                 # Apply search filter if a query is provided
                 search_query = self.request.GET.get('search', '')
                 if search_query:
@@ -289,8 +299,12 @@ class MyBoardView(ListView):
         # Get the patient ID from the form data
         patient_id = request.POST.get('patient_id')
         user = request.user
+        unit_id = get_authorized_unit_id(user)
         patient = get_object_or_404(
-            Patient.objects.filter(treatmentrecord__worker=user).distinct(),
+            Patient.objects.filter(
+                treatmentrecord__worker=user,
+                geocode_id=unit_id,
+            ).distinct(),
             id=patient_id,
         )
 
