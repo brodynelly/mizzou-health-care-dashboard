@@ -5,20 +5,20 @@ from django.db import migrations
 
 def create_superuser(apps, schema_editor):
     # Get the user model
-    User = apps.get_model('accounts', 'CustomUser')
+    User = apps.get_model("accounts", "CustomUser")
 
     # Create a superuser if one doesn't already exist
-    if not User.objects.filter(email='admin@example.com').exists():
+    if not User.objects.filter(email="admin@example.com").exists():
         User.objects.create_superuser(
             username="adminusername",
-            email='admin@mail.com',
-            password='adminpassword',
-            first_name='Admin',
-            last_name='User',
+            email="admin@mail.com",
+            password="adminpassword",
+            first_name="Admin",
+            last_name="User",
         )
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
         ("accounts", "0007_customuser_primary_geocode"),
     ]

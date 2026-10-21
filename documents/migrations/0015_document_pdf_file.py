@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0014_alter_document_patient'),
+        ("documents", "0014_alter_document_patient"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='pdf_file',
-            field=models.FileField(blank=True, null=True, upload_to='documents/pdfs/'),
+            model_name="document",
+            name="pdf_file",
+            field=models.FileField(blank=True, null=True, upload_to="documents/pdfs/"),
         ),
     ]

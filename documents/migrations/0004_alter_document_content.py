@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0003_initial'),
+        ("documents", "0003_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='content',
+            model_name="document",
+            name="content",
             field=models.TextField(),
         ),
     ]

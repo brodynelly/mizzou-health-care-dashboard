@@ -84,7 +84,6 @@ def create_users(apps, schema_editor):
             "role": role_objects["nurse"],
             "geocode_index": 6,
         },
-
         {
             "username": "doctor1",
             "email": "doctor1@mail.com",
@@ -119,7 +118,6 @@ def create_users(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("accounts", "0010_auto_20241029_2136"),
     ]

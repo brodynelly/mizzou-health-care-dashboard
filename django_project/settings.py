@@ -39,10 +39,10 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 # Application definition
 
 INSTALLED_APPS = [
-    #more 3rd party
+    # more 3rd party
     "dal",
     "dal_select2",
-    #django contrib
+    # django contrib
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -50,13 +50,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
-    #3rd party
+    # 3rd party
     "crispy_forms",
     "crispy_bootstrap5",
     "allauth",
     "allauth.account",
     "django_summernote",
-    #user created
+    # user created
     "accounts",
     "pages",
     "patients",
@@ -72,7 +72,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-
 ]
 
 ROOT_URLCONF = "django_project.urls"
@@ -140,13 +139,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-#used in collectstatic
+# used in collectstatic
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
-    "default":{
-        "BACKEND": "django.core.files.storage.FileSystemStorage"
-    },
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
@@ -168,7 +165,7 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
 
-#all auth config
+# all auth config
 ACCOUNT_LOGOUT_REDIRECT = "home"
 SITE_ID = 1
 
@@ -182,20 +179,20 @@ ACCOUNT_SESSION_REMEMBER = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 ACCOUNT_FORMS = {
-    'signup': 'accounts.forms.CustomSignupForm',
+    "signup": "accounts.forms.CustomSignupForm",
 }
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Use email to authenticate
+ACCOUNT_AUTHENTICATION_METHOD = "email"  # Use email to authenticate
 ACCOUNT_EMAIL_REQUIRED = True  # Email is required for signup
 ACCOUNT_USERNAME_REQUIRED = False  # Username is not required
 
-#summernote options
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+# summernote options
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 # allows to load iframe from same hostname
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 SUMMERNOTE_CONFIG = {
-    'iframe': False,  # Use inplace editing
+    "iframe": False,  # Use inplace editing
 }

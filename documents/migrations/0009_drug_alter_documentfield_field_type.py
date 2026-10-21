@@ -4,22 +4,38 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('documents', '0008_document_document_type_documentfieldvalue'),
+        ("documents", "0008_document_document_type_documentfieldvalue"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Drug',
+            name="Drug",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
         migrations.AlterField(
-            model_name='documentfield',
-            name='field_type',
-            field=models.CharField(choices=[('text', 'Text'), ('number', 'Number'), ('date', 'Date'), ('rich_text', 'Rich Text'), ('drug', 'Drug')], max_length=50),
+            model_name="documentfield",
+            name="field_type",
+            field=models.CharField(
+                choices=[
+                    ("text", "Text"),
+                    ("number", "Number"),
+                    ("date", "Date"),
+                    ("rich_text", "Rich Text"),
+                    ("drug", "Drug"),
+                ],
+                max_length=50,
+            ),
         ),
     ]

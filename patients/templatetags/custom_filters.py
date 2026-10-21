@@ -17,6 +17,7 @@ def ordinal(value):
     except (TypeError, ValueError):
         return value
 
+
 @register.filter
 def humanize_snake_case(value):
     return " ".join(word.capitalize() for word in value.split("_"))

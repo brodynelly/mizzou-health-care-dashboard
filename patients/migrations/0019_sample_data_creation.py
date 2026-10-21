@@ -3,14 +3,15 @@ from datetime import date
 
 from django.db import migrations
 
-UNASSIGNED = 'unassigned'
-NURSE_ASSIGNED = 'nurse_assigned'
-DOCTOR_ASSIGNED = 'doctor_assigned'
+UNASSIGNED = "unassigned"
+NURSE_ASSIGNED = "nurse_assigned"
+DOCTOR_ASSIGNED = "doctor_assigned"
 STATE_CHOICES = [
-    (UNASSIGNED, 'Unassigned'),
-    (NURSE_ASSIGNED, 'Nurse Assigned'),
-    (DOCTOR_ASSIGNED, 'Doctor Assigned'),
+    (UNASSIGNED, "Unassigned"),
+    (NURSE_ASSIGNED, "Nurse Assigned"),
+    (DOCTOR_ASSIGNED, "Doctor Assigned"),
 ]
+
 
 def assign_nurse_to_patient(apps, schema_editor, patient_id, nurse_user_id):
     Patient = apps.get_model("patients", "Patient")
@@ -36,6 +37,7 @@ def assign_nurse_to_patient(apps, schema_editor, patient_id, nurse_user_id):
     patient.nurse_count += 1
     patient.state = NURSE_ASSIGNED
     patient.save()
+
 
 def assign_doctor_to_patient(apps, schema_editor, patient_id, doctor_user_id):
     Patient = apps.get_model("patients", "Patient")
@@ -211,7 +213,7 @@ def create_sample_data(apps, schema_editor):
     TreatmentRecord.objects.all().delete()
 
     # Create users first
-    users_data = create_users(apps, schema_editor)
+    create_users(apps, schema_editor)
 
     # Get geocodes
     geocode_1 = Geocode.objects.get(name="Celestial Heights")
@@ -807,7 +809,6 @@ def create_sample_data(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("patients", "0018_patient_doctor_assigned_patient_nurse_count_and_more"),
         ("accounts", "0011_auto_20241029_2354"),

@@ -9,10 +9,10 @@ def create_roles(apps, schema_editor):
     Role.objects.get_or_create(name="nurse")
     Role.objects.get_or_create(name="admin")
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('accounts', '0004_alter_customuser_email'),
+        ("accounts", "0004_alter_customuser_email"),
     ]
 
     operations = [

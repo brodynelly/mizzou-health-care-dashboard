@@ -168,7 +168,7 @@ class PatientViewTests(TestCase):
                 "blood_group": "O+",
                 "bed_id": "B1",
                 "treatment_area": "ICU",
-            }
+            },
         )
         self.assertTrue(form.is_valid(), form.errors)
 

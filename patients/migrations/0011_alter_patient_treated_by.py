@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('patients', '0010_auto_20241029_2131'),
+        ("patients", "0010_auto_20241029_2131"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='patient',
-            name='treated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='patients', to='patients.treatmentrecord'),
+            model_name="patient",
+            name="treated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="patients",
+                to="patients.treatmentrecord",
+            ),
         ),
     ]

@@ -5,16 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0006_alter_customuser_username'),
-        ('patients', '0005_auto_20241023_1941'),
+        ("accounts", "0006_alter_customuser_username"),
+        ("patients", "0005_auto_20241023_1941"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='primary_geocode',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='patients.geocode'),
+            model_name="customuser",
+            name="primary_geocode",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="patients.geocode",
+            ),
         ),
     ]

@@ -4,7 +4,11 @@ target-version = "py310"
 
 [lint]
 select = ["E", "F", "I", "N", "W"]
-ignore = []
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+"__init__.py" = ["N999"]
+"**/migrations/*.py" = ["N805", "N806"]
 
 [format]
 quote-style = "double"
